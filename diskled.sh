@@ -1,5 +1,5 @@
 #!/bin/bash
-[ "$1" = "-h" ] && { 
+[ "$1" = "-h" -o "$1" = "--help" ] && {
   echo "Usage: $0 [0|1]
  0 => not verbose [default]
  1 => verbose mode.
@@ -11,5 +11,5 @@ verbose=0
 if [ $# -eq 1 ] ; then
     [ $1 -eq 1 ] && verbose=1
 fi
+# 1st param to led_putios is the # of IOs at which the LED is turned On
 ./led_getios | ./led_putios 2 ${verbose}
-#./led_getios |sudo ./led_putios 2 ${verbose}

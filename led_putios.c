@@ -7,9 +7,6 @@
  * History:
  *  02Nov2017
  *
- * TODO
- *	- use capability to read/write proc, not full root
- *
  * Author(s) : 
  * Kaiwan N Billimoria
  *  <kaiwan -at- kaiwantech -dot- com>
@@ -39,36 +36,38 @@
 } while(0)
 
 /*---------------- Function prototypes ------------------------------*/
-static void	__drive_led(int fd, int state);
+static void __drive_led(int fd, int state);
 int r_sleep(time_t sec, long nsec);
 
 /*---------------- Globals, typedef's, constants, etc ---------------*/
-const char buf_on[]="0 on";
-const char buf_off[]="0 off";
-static unsigned int gLed_turnon_threshold=0;
-static int gLedfd, gVerbose=0;
+const char buf_on[] = "0 on";
+const char buf_off[] = "0 off";
+static unsigned int gLed_turnon_threshold = 0;
+static int gLedfd, gVerbose = 0;
 
 /*---------------- Functions ----------------------------------------*/
 
-static void user_interrupt(int signum, siginfo_t *siginfo, void *rest)
+static void user_interrupt(int signum, siginfo_t * siginfo, void *rest)
 {
 	switch (signum) {
-		case SIGINT:
-		case SIGQUIT:
-		case SIGHUP:
-			fprintf(stderr, "\n*** [!] %s(%d): aborting due to user interrupt (signal %d) ***\n",
-				PRGNAME, getpid(), signum);
-			LED_TURN_OFF(gLedfd);
-			close(gLedfd);
-			exit(2);
-		case SIGUSR1:
-			fprintf(stderr, "\n[*] %s(%d): received signal %d, toggling verbose mode now\n",
-				PRGNAME, getpid(), signum);
-			if (1 == gVerbose)
-				gVerbose=0;
-			else
-				gVerbose=1;
-			break;
+	case SIGINT:
+	case SIGQUIT:
+	case SIGHUP:
+		fprintf(stderr,
+			"\n*** [!] %s(%d): aborting due to user interrupt (signal %d) ***\n",
+			PRGNAME, getpid(), signum);
+		LED_TURN_OFF(gLedfd);
+		close(gLedfd);
+		exit(2);
+	case SIGUSR1:
+		fprintf(stderr,
+			"\n[*] %s(%d): received signal %d, toggling verbose mode now\n",
+			PRGNAME, getpid(), signum);
+		if (1 == gVerbose)
+			gVerbose = 0;
+		else
+			gVerbose = 1;
+		break;
 	}
 }
 
@@ -100,35 +99,29 @@ static void init_signals(void)
 	}
 }
 
-static void	__drive_led(int fd, int state)
+static void __drive_led(int fd, int state)
 {
 	if (state) {
-		write(fd, buf_on, strlen(buf_on)); // "should" succeed
-		//puts("On");
+		write(fd, buf_on, strlen(buf_on));	// "should" succeed
 	} else {
-		write(fd, buf_off, strlen(buf_off)); // "should" succeed
-		//puts("Off");
+		write(fd, buf_off, strlen(buf_off));	// "should" succeed
 	}
 }
 
 /*
  * This function receives a parameter - the current "number of IOs in progress"
-
-It will interpret it and if it's zero, will
-turn OFF the IBM Thinkpad Power LED (LED #0, accessed via /proc/acpi/ibm/led ;
- echo "0 off" > /proc/acpi/ibm/led
-To turn it On:
- echo "0 on" > /proc/acpi/ibm/led
-).
-
-Depending on whether the ios cross a threshold (TBD), we switch the LED on.
-*/
-#define TURN_ON_THRESHOLD     20
-static void	drive_led(int fd, unsigned long numios)
+ * It will interpret it and if it's zero, will turn OFF the IBM Thinkpad Power
+ * LED (LED #0, accessed via /proc/acpi/ibm/led ;
+ *  echo "0 off" > /proc/acpi/ibm/led
+ * To turn it On:
+ *  echo "0 on" > /proc/acpi/ibm/led
+ *).
+ * Depending on whether the ios cross a threshold (TBD), we switch the LED on.
+ */
+static void drive_led(int fd, unsigned long numios)
 {
 	if (numios == 0)
 		__drive_led(fd, OFF);
-	//else if (numios >= TURN_ON_THRESHOLD)
 	else if (numios >= gLed_turnon_threshold)
 		__drive_led(fd, ON);
 }
@@ -139,25 +132,27 @@ int main(int argc, char **argv)
 {
 	char rec[RECMAX];
 	unsigned long ios_in_progress;
-	
+
 	init_signals();
 
 	if (argc < 2) {
-		fprintf(stderr, "Usage: %s led_turn_on_threshold [gVerbose=0|1]\n"
-						"2nd param == 1 => gVerbose mode, [def: 0 or !gVerbose]\n", 
-					argv[0]);
+		fprintf(stderr,
+			"Usage: %s led_turn_on_threshold [verbose=0|1]\n"
+			"1st param : number of IOs in progress threshold at which LED is turned On\n"
+			"2nd param == 1 => verbose mode, [def: 0 or !verbose]\n",
+			argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	gLed_turnon_threshold=atoi(argv[1]);
+	gLed_turnon_threshold = atoi(argv[1]);
 	if (argc == 3)
-		gVerbose=atoi(argv[2]);
+		gVerbose = atoi(argv[2]);
 
-	//if (1 == gVerbose)
-		printf("[+] %s(%d): initializing ... led_turnon_threshold=%u, gVerbose=%d\n",
-				PRGNAME, getpid(), gLed_turnon_threshold, gVerbose);
+	printf
+	    ("[+] %s(%d): initializing ... led_turnon_threshold=%u, verbose=%d\n",
+	     PRGNAME, getpid(), gLed_turnon_threshold, gVerbose);
 
 	if ((gLedfd = open(LED_FILE, O_RDWR)) == -1) {
-		fprintf(stderr,"%s(%d): open on %s failed, aborting...\n"
+		fprintf(stderr, "[!] %s(%d): open on %s failed, aborting...\n"
 			" (Tip: need to run as superuser)\n",
 			argv[0], getpid(), LED_FILE);
 		return 1;
@@ -166,7 +161,8 @@ int main(int argc, char **argv)
 
 	while (1) {
 		if ((fgets(rec, RECMAX, stdin)) == NULL) {
-			fprintf(stderr,"%s(%d): no data!\n", argv[0], getpid());
+			fprintf(stderr, "%s(%d): no data!\n", argv[0],
+				getpid());
 			close(gLedfd);
 			return 1;
 		}
@@ -174,12 +170,12 @@ int main(int argc, char **argv)
 		if (1 == gVerbose)
 			fprintf(stderr, " %lu", ios_in_progress);
 		drive_led(gLedfd, ios_in_progress);
-		r_sleep(0,5000000); // s,ns // 5 ms
+		r_sleep(0, 5000000);	// s,ns // 5 ms
 	}
 
 	LED_TURN_OFF(gLedfd);
 	close(gLedfd);
-	exit (EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }
 
 /* vi: ts=4 */

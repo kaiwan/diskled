@@ -1,20 +1,17 @@
 # Makefile
-# Ref: http://nuclear.mutantstargoat.com/articles/make/
-#ALL := led_getios led_getios_dbgsym
 ALL := led_getios led_putios
 
 CC=${CROSS_COMPILE}gcc
 CFLAGS_DBG=-D_REENTRANT -g -ggdb -gdwarf -O0 -Wall -Wextra
-CFLAGS=-D_REENTRANT -Wall -Wextra
+CFLAGS=-D_REENTRANT -O3 -Wall -Wextra
 
 all: ${ALL}
 CB_FILES := *.[ch]
 
-#src = $(wildcard *.c)
 src_getios = led_getios.c
 obj_getios = $(src:.c=.o)
 
-LDFLAGS = #-lGL -lglut -lpng -lz -lm
+LDFLAGS =
 
 led_getios: led_getios.o convenient.o
 	$(CC) ${CFLAGS} -o $@ $^ $(LDFLAGS)
