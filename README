@@ -1,0 +1,32 @@
+Motivation:
+Some laptops (like the Lenovo/IBM Thinkpad T460 that I use), don't have any
+HDD LED disk activity indicator, and that just won't do!!!
+
+We'd like to simulate this using software, and an LED on the laptop that we
+do have control over (eg., the Power Led #0 over the procfs interface;
+details below).
+
+
+ledio 2> io.dat
+
+io.dat : ASCII text CSV file - contains the CSV of the value of /proc/diskstats
+"# IOs currently in progress" incremental field; currently captured once every
+5 ms.
+
+led_putios:
+Write a C prg that reads CSV of 'ios in progress" from stdin; feed io.dat as
+stdin to it:
+  ./led_putios < io.dat
+
+led_putios prg will interpret the 'ios in progress' numbers, and if it's zero, will
+turn OFF the IBM Thinkpad Power LED (LED #0, accessed via /proc/acpi/ibm/led ;
+ echo "0 off" > /proc/acpi/ibm/led
+).
+
+Depending on whether the ios cross a threshold (TBD), we switch the LED on.
+
+
+Ref:
+https://www.kernel.org/doc/Documentation/laptops/thinkpad-acpi.txt
+https://www.kernel.org/doc/Documentation/iostats.txt
+idea- https://www.reddit.com/r/linux/comments/25teew/turn_your_scroll_lock_into_disk_activity_indicator/
