@@ -153,7 +153,8 @@ int main(int argc, char **argv)
 
 	if ((gLedfd = open(LED_FILE, O_RDWR)) == -1) {
 		fprintf(stderr, "[!] %s(%d): open on %s failed, aborting...\n"
-			" (Tip: need to run as superuser)\n",
+		    "Check, does your Linux laptop system have this hardware LED and thus this proc file?"
+			" (alternate tip: try as superuser, though it should have perms via caps)\n",
 			argv[0], getpid(), LED_FILE);
 		return 1;
 	}
