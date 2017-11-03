@@ -2,7 +2,7 @@
 
 **1-line Summary:**
 Some laptops don't have a disk activity LED, and that just won't do! 
-This project aims to reuse the an existing LED as a disk activity indicator.
+This project aims to reuse an existing LED as a disk activity indicator.
 
 ***NOTE !***
 Specifically coded to support a **Lenovo (IBM) Thinkpad T460** laptop; we use the Power LED \#0 as the disk activity LED.
