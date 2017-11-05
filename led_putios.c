@@ -52,6 +52,7 @@ static void user_interrupt(int signum, siginfo_t * siginfo, void *rest)
 	switch (signum) {
 	case SIGINT:
 	case SIGQUIT:
+	case SIGTERM:
 	case SIGHUP:
 		fprintf(stderr,
 			"\n*** [!] %s(%d): aborting due to user interrupt (signal %d) ***\n",
@@ -85,6 +86,10 @@ static void init_signals(void)
 		exit(1);
 	}
 	if (sigaction(SIGQUIT, &act, 0) == -1) {
+		perror("sigaction SIGQUIT");
+		exit(1);
+	}
+	if (sigaction(SIGTERM, &act, 0) == -1) {
 		perror("sigaction SIGQUIT");
 		exit(1);
 	}
@@ -153,7 +158,7 @@ int main(int argc, char **argv)
 
 	if ((gLedfd = open(LED_FILE, O_RDWR)) == -1) {
 		fprintf(stderr, "[!] %s(%d): open on %s failed, aborting...\n"
-		    "Check, does your Linux laptop system have this hardware LED and thus this proc file?"
+		    "Check, does your Linux laptop system have this hardware LED and thus this proc file?\n"
 			" (alternate tip: try as superuser, though it should have perms via caps)\n",
 			argv[0], getpid(), LED_FILE);
 		return 1;

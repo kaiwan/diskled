@@ -3,7 +3,7 @@ ALL := led_getios led_putios
 
 CC=${CROSS_COMPILE}gcc
 CFLAGS_DBG=-D_REENTRANT -g -ggdb -gdwarf -O0 -Wall -Wextra
-CFLAGS=-D_REENTRANT -O3 -Wall -Wextra
+CFLAGS=-D_REENTRANT -Wall -Wextra
 
 all: ${ALL}
 CB_FILES := *.[ch]
