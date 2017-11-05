@@ -9,11 +9,14 @@ Specifically coded to support a **Lenovo (IBM) Thinkpad T460** laptop; we use th
 
 I got the idea when reading a reddit post talking about similar stuff [3].
 
+[Hey, check out the YouTube video screencast for diskled here!][4]
+
 We'd like to simulate this using software, and an LED on the laptop that we
 do have control over (eg., the Power Led #0 over the procfs interface; details below).
 
 
 **A REQUEST**
+
 Pl try this on a similar laptop and let me know if it works, or what your
 experience is.
 
@@ -72,5 +75,6 @@ The program is built architected as a **producer-consumer** model:
 [1] https://www.kernel.org/doc/Documentation/iostats.txt
 [2] https://www.kernel.org/doc/Documentation/laptops/thinkpad-acpi.txt
 [3] https://www.reddit.com/r/linux/comments/25teew/turn_your_scroll_lock_into_disk_activity_indicator/
+[4] https://youtu.be/ELmu6sTYD08
 
-*Written with [StackEdit](https://stackedit.io/).*
+* Partially written with [StackEdit](https://stackedit.io/).*
